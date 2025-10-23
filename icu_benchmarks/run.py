@@ -140,6 +140,7 @@ def main(my_args=tuple(sys.argv[1:])):
         # Normal train and evaluate
         name_datasets(args.name, args.name, args.name)
         hp_checkpoint = log_dir / args.hp_checkpoint if args.hp_checkpoint else None
+        logging.info(f"Hyperparameter tuning checkpoint: {hp_checkpoint}. {hp_checkpoint.exists()=}" if hp_checkpoint else "No hyperparameter tuning checkpoint provided.")
         model_path = (
             Path("configs") / ("imputation_models" if mode == RunMode.imputation else "prediction_models") / f"{model}.gin"
         )
