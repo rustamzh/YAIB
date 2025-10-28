@@ -349,13 +349,8 @@ def choose_and_bind_hyperparameters_optuna(
         # checkpoint_path = find_checkpoint(log_dir.parent, checkpoint_file)
         # Check if we found a checkpoint file
         logging.info(f"Loading checkpoint at {checkpoint}")
-        study = optuna.load_study(
-            study_name="tuning",
-            storage="sqlite:///" + str(checkpoint),
-            sampler=sampler,
-            pruner=pruner,
-        )
-        n_calls = n_calls - len(study.trials)
+        study = optuna.load_study(study_name="tuning", storage="sqlite:///" + str(checkpoint), sampler=sampler, pruner=pruner)
+        n_calls = n_calls - len(study.get_trials(states=(optuna.trial.TrialState.COMPLETE,)))
     else:
         if checkpoint:
             logging.warning("Checkpoint path given as flag but not found, starting from scratch.")
