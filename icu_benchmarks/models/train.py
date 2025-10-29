@@ -152,6 +152,8 @@ def train_common(
         logging.info(f"Start getting data_shape")
         data_shape = next(iter(train_loader))[0].shape
         logging.info(f"Got data_shape: {data_shape}")
+    else:
+        data_shape = None
 
     if load_weights:
         model: DLModel | MLModelClassifier | MLModelRegression = load_model(model, source_dir, pl_model=pl_model)
