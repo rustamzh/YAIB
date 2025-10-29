@@ -2,6 +2,7 @@ import logging
 import os
 from pathlib import Path
 from typing import Literal, Optional
+from typing import get_args
 
 import gin
 import numpy as np
@@ -147,7 +148,10 @@ def train_common(
         pin_memory=not cpu,
     )
 
-    data_shape = next(iter(train_loader))[0].shape
+    if issubclass(model, get_args(DLModel)):
+        logging.info(f"Start getting data_shape")
+        data_shape = next(iter(train_loader))[0].shape
+        logging.info(f"Got data_shape: {data_shape}")
 
     if load_weights:
         model: DLModel | MLModelClassifier | MLModelRegression = load_model(model, source_dir, pl_model=pl_model)
