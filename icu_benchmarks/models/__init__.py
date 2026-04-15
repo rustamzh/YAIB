@@ -8,7 +8,7 @@ from icu_benchmarks.models.dl_models.transformer import (
     Transformer,
 )
 from icu_benchmarks.models.ml_models.catboost import CBClassifier
-from icu_benchmarks.models.ml_models.imblearn import BRFClassifier, RUSBClassifier
+# from icu_benchmarks.models.ml_models.imblearn import BRFClassifier, RUSBClassifier
 from icu_benchmarks.models.ml_models.lgbm import LGBMClassifier, LGBMRegressor
 from icu_benchmarks.models.ml_models.sklearn import (
     ElasticNet,
@@ -35,8 +35,8 @@ DLModel = Union[
 MLModelClassifier = Union[
     XGBClassifier,
     LGBMClassifier,
-    RUSBClassifier,
-    BRFClassifier,
+    # RUSBClassifier,
+    # BRFClassifier,
     CBClassifier,
     LogisticRegression,
     SVMClassifier,
@@ -61,8 +61,8 @@ __all__ = [
     "Transformer",
     "LocalTransformer",
     "CBClassifier",
-    "RUSBClassifier",
-    "BRFClassifier",
+    # "RUSBClassifier",
+    # "BRFClassifier",
     "LGBMClassifier",
     "LGBMRegressor",
     "XGBClassifier",
