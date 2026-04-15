@@ -3,13 +3,14 @@ from sklearn import linear_model, ensemble, svm, neural_network
 from icu_benchmarks.constants import RunMode
 from icu_benchmarks.models.wrappers import MLWrapper
 
+from cuml import linear_model as cu_linear_model
 
 @gin.configurable
 class LogisticRegression(MLWrapper):
     _supported_run_modes = [RunMode.classification]
 
     def __init__(self, *args, **kwargs):
-        self.model = self.set_model_args(linear_model.LogisticRegression, *args, **kwargs)
+        self.model = self.set_model_args(cu_linear_model.LogisticRegression, *args, **kwargs)
         super().__init__(*args, **kwargs)
 
 
