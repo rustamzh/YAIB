@@ -8,7 +8,7 @@ train_common.model = @ElasticNet
 
 model/hyperparameter.class_to_tune = @ElasticNet
 #model/hyperparameter.solver = "saga"
-model/hyperparameter.n_jobs = 8
+model/hyperparameter.n_jobs = 96
 model/hyperparameter.max_iter = 10000
 model/hyperparameter.alpha = (1e-2, 1e1, "log-uniform")
 model/hyperparameter.tol = (1e-5, 1e-1, "log-uniform")

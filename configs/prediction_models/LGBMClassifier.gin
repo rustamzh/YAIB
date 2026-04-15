@@ -14,3 +14,5 @@ model/hyperparameter.n_estimators = 100000
 model/hyperparameter.num_leaves = (8, 128, "log", 2)
 model/hyperparameter.subsample = (0.33, 1.0)
 model/hyperparameter.subsample_freq = 1
+model/hyperparameter.n_jobs = 96
+model/hyperparameter.device_type= "cuda"
