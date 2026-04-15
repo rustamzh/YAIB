@@ -62,14 +62,19 @@ def main(my_args=tuple(sys.argv[1:])):
     if args.label:
         logging.debug(f"Binding label: {args.label}")
         gin.bind_parameter("preprocess.label", args.label)
-    tasks, models = get_config_files(Path("configs"))
+        
+    tasks, models = get_config_files(Path(args.configs))
     if task not in tasks or model not in models:
         raise ValueError(
             f"Invalid task or model. Task: {task} {'not ' if task not in tasks else ''} found. "
             f"Model: {model} {'not ' if model not in models else ''}found."
         )
     # Load task config
-    gin.parse_config_file(f"configs/tasks/{task}.gin")
+    includes_ = gin.parse_config_file(Path(args.configs) / f"tasks/{task}.gin")
+    print("Includes")
+    print(includes_)
+    #print("Imports")
+    #print(imports_)
     mode = get_mode()
 
     # Set experiment name
@@ -129,7 +134,7 @@ def main(my_args=tuple(sys.argv[1:])):
         run_dir = create_run_dir(log_dir)
         source_dir = args.source_dir
         logging.info(f"Will load weights from {source_dir} and bind train gin-config. Note: this might override your config.")
-        gin.parse_config_file(source_dir / "train_config.gin")
+        gin.parse_config_file(source_dir / "train_config.gin", print_includes_and_imports=True)
     elif args.samples and args.source_dir is not None:  # Train model with limited samples and bind existing config
         logging.info("Binding train gin-config. Note: this might override your config.")
         gin.parse_config_file(args.source_dir / "train_config.gin")
@@ -145,9 +150,9 @@ def main(my_args=tuple(sys.argv[1:])):
             Path("configs") / ("imputation_models" if mode == RunMode.imputation else "prediction_models") / f"{model}.gin"
         )
         gin_config_files = (
-            [Path(f"configs/experiments/{args.experiment}.gin")]
+            [Path(args.configs) / Path(f"experiments/{args.experiment}.gin")]
             if args.experiment
-            else [model_path, Path(f"configs/tasks/{task}.gin")]
+            else [model_path, Path(args.configs) / Path(f"tasks/{task}.gin")]
         )
         gin.parse_config_files_and_bindings(gin_config_files, args.hyperparams, finalize_config=False)
         log_full_line(f"Data directory: {data_dir.resolve()}", level=logging.INFO)

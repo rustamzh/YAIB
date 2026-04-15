@@ -115,13 +115,8 @@ def build_parser() -> ArgumentParser:
     )
     parser.add_argument("-sn", "--source-name", type=Path, help="Name of the source dataset.")
     parser.add_argument("--source-dir", type=Path, help="Directory containing gin and model weights.")
-    parser.add_argument(
-        "-sa",
-        "--samples",
-        type=int,
-        default=None,
-        help="Number of samples to use for evaluation.",
-    )
+    parser.add_argument("-sa", "--samples", type=int, default=None, help="Number of samples to use for evaluation.")
+    parser.add_argument("--configs", default="configs", help="Name of the dir with gin configs.")
     parser.add_argument(
         "-mo",
         "--modalities",
