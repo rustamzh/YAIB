@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from typing import Literal, Optional
 from typing import get_args
+import traceback
 
 import gin
 import numpy as np
@@ -29,6 +30,7 @@ from icu_benchmarks.data.loader import (
 )
 from icu_benchmarks.models import DLModel, MLModelClassifier, MLModelRegression
 from icu_benchmarks.models.utils import JSONMetricsLogger, save_config_file
+from icu_benchmarks.models.wrappers import BaseModule
 
 cpu_core_count = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count()
 cpu_core_count = 1 if not cpu_core_count else cpu_core_count  #  os.cpu_count possibly None
@@ -157,7 +159,7 @@ def train_common(
         data_shape = None
 
     if load_weights:
-        model: DLModel | MLModelClassifier | MLModelRegression = load_model(model, source_dir, pl_model=pl_model)
+        model: DLModel | MLModelClassifier | MLModelRegression = load_model(model, source_dir, pl_model=pl_model, optimizer=optimizer, input_size=data_shape, epochs=epochs, run_mode=mode, cpu=cpu)
     else:
         model: DLModel | MLModelClassifier | MLModelRegression = model(
             optimizer=optimizer,
@@ -275,7 +277,7 @@ def persist_shap_data(trainer: Trainer, log_dir: Path):
         logging.error(f"Failed to save shap values: {e}")
 
 
-def load_model(model, source_dir, pl_model=True) -> DLModel | MLModelClassifier | MLModelRegression:
+def load_model(model, source_dir, pl_model=True, **model_kwargs) -> DLModel | MLModelClassifier | MLModelRegression:
     if source_dir.exists():
         if model.requires_backprop:
             if (source_dir / "model.ckpt").exists():
@@ -292,8 +294,26 @@ def load_model(model, source_dir, pl_model=True) -> DLModel | MLModelClassifier 
                 checkpoint = torch.load(model_path)
                 model.load_from_checkpoint(checkpoint)
         else:
-            model_path = source_dir / "model.joblib"
+            if (source_dir / "last.joblib").exists():
+                model_path = source_dir / "last.joblib"
+            elif (source_dir / "model.joblib").exists():
+                model_path = source_dir / "model.joblib"
+            else:
+                model_path = source_dir
+
+            model_class = model
             model = load(model_path)
+            if not isinstance(model, model_class):
+                logging.info(f"Loaded {type(model)} model instead of {model_class}.")
+                try:
+                    logging.info(f"Trying to integrate {type(model)} model into {model_class}.")
+                    new_model = model_class(**model_kwargs)
+                    new_model.model = model
+                    model = new_model
+                    logging.info(f"Succeeded integrating {type(model)} model into {model_class}.")
+                except Exception:
+                    logging.info(traceback.format_exc())
+                    logging.info(f"Failed to integrate {type(model)} model into {model_class}.")
     else:
         raise Exception(f"No weights to load at path : {source_dir}")
     logging.info(f"Loaded {type(model)} model from {model_path}")
